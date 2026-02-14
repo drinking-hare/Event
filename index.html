@@ -12,71 +12,52 @@ function createHearts() {
     heart.style.left = Math.random() * window.innerWidth + "px";
     heart.style.top = window.innerHeight + "px";
     document.body.appendChild(heart);
-
     setTimeout(() => heart.remove(), 3000);
   }
 }
 
-// ✅ No 버튼: 카드 안에서만 도망 (사라짐 방지 + 모바일 대응)
 const noBtn = document.getElementById("noBtn");
 const card = document.querySelector(".card");
 
-// 카드가 좌표 기준이 되도록 설정 (중요)
+// 카드 기준으로 이동 (사라짐 방지)
 card.style.position = "relative";
 noBtn.style.position = "absolute";
 
-// 초기 위치를 버튼 컨테이너 자리 근처로 지정
-// (원래 버튼 레이아웃 유지하고 싶으면, 아래처럼 시작 좌표만 잡고 absolute로 전환)
 function placeNoInitial() {
   const cardRect = card.getBoundingClientRect();
   const btnRect = noBtn.getBoundingClientRect();
-
-  // 카드 내부 좌표로 변환
-  const left = (btnRect.left - cardRect.left);
-  const top  = (btnRect.top - cardRect.top);
-
-  noBtn.style.left = `${left}px`;
-  noBtn.style.top  = `${top}px`;
+  noBtn.style.left = `${btnRect.left - cardRect.left}px`;
+  noBtn.style.top  = `${btnRect.top  - cardRect.top }px`;
 }
 
-// 카드 내부에서 랜덤 위치로 이동
 function moveNoButton() {
-  const cardRect = card.getBoundingClientRect();
-
-  // 버튼 크기
+  const rect = card.getBoundingClientRect();
   const bw = noBtn.offsetWidth;
   const bh = noBtn.offsetHeight;
+  const pad = 12;
 
-  // 카드 패딩 고려해서 너무 가장자리로 안 붙게
-  const padding = 12;
+  const maxX = rect.width  - bw - pad;
+  const maxY = rect.height - bh - pad;
 
-  const maxX = Math.max(padding, cardRect.width - bw - padding);
-  const maxY = Math.max(padding, cardRect.height - bh - padding);
-
-  const x = padding + Math.random() * (maxX - padding);
-  const y = padding + Math.random() * (maxY - padding);
+  const x = pad + Math.random() * Math.max(1, (maxX - pad));
+  const y = pad + Math.random() * Math.max(1, (maxY - pad));
 
   noBtn.style.left = `${x}px`;
   noBtn.style.top  = `${y}px`;
 }
 
-// 데스크톱: 마우스 올리면 도망
+// PC
 noBtn.addEventListener("mouseenter", moveNoButton);
-
-// 모바일: 터치하려고 하면 도망 (click 전에 먼저 튀게)
+// 모바일(터치로 “누르기 전에” 튀기)
 noBtn.addEventListener("touchstart", (e) => {
-  e.preventDefault();      // 탭으로 눌리는 걸 방지
+  e.preventDefault();
   moveNoButton();
 }, { passive: false });
-
-// 혹시 클릭으로 들어오면 그것도 도망
+// 혹시 클릭이 들어와도 튀기
 noBtn.addEventListener("click", (e) => {
   e.preventDefault();
   moveNoButton();
 });
 
-// 페이지 로드 후 초기 위치 고정
-window.addEventListener("load", () => {
-  placeNoInitial();
-});
+window.addEventListener("load", placeNoInitial);
 </script>
