@@ -1,133 +1,82 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>화이트데이 이벤트</title>
-<style>
-    body {
-        margin: 0;
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background: linear-gradient(135deg, #ff9a9e, #fad0c4);
-        font-family: 'Pretendard', sans-serif;
-        overflow: hidden;
-    }
-
-    .card {
-        background: white;
-        padding: 40px;
-        border-radius: 20px;
-        text-align: center;
-        box-shadow: 0 15px 40px rgba(0,0,0,0.2);
-        max-width: 400px;
-        position: relative;
-    }
-
-    h1 {
-        font-size: 20px;
-        margin-bottom: 30px;
-        line-height: 1.6;
-    }
-
-    .btn-container {
-        display: flex;
-        justify-content: center;
-        gap: 20px;
-    }
-
-    button {
-        padding: 12px 25px;
-        border-radius: 30px;
-        border: none;
-        font-size: 16px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        position: relative;
-    }
-
-    .yes {
-        background-color: #ff4d6d;
-        color: white;
-    }
-
-    .yes:hover {
-        transform: scale(1.1);
-    }
-
-    .no {
-        background-color: #ccc;
-    }
-
-    .result {
-        margin-top: 25px;
-        font-size: 22px;
-        font-weight: bold;
-        color: #ff4d6d;
-        display: none;
-    }
-
-    .heart {
-        position: absolute;
-        font-size: 20px;
-        animation: float 3s linear infinite;
-    }
-
-    @keyframes float {
-        0% { transform: translateY(0) scale(1); opacity: 1; }
-        100% { transform: translateY(-300px) scale(1.5); opacity: 0; }
-    }
-</style>
-</head>
-<body>
-
-<div class="card">
-    <h1>발렌타인데이에는 못만났지만<br>화이트데이에 같이 데이트 할래?</h1>
-    
-    <div class="btn-container">
-        <button class="yes" onclick="accept()">Yes</button>
-        <button class="no" id="noBtn">No</button>
-    </div>
-
-    <div class="result" id="result">
-        ❤️ 우리 화이트데이 데이트 확정 ❤️
-    </div>
-</div>
-
 <script>
 function accept() {
-    document.getElementById("result").style.display = "block";
-    createHearts();
+  document.getElementById("result").style.display = "block";
+  createHearts();
 }
 
 function createHearts() {
-    for(let i = 0; i < 20; i++) {
-        const heart = document.createElement("div");
-        heart.classList.add("heart");
-        heart.innerHTML = "❤️";
-        heart.style.left = Math.random() * window.innerWidth + "px";
-        heart.style.top = window.innerHeight + "px";
-        document.body.appendChild(heart);
+  for (let i = 0; i < 20; i++) {
+    const heart = document.createElement("div");
+    heart.classList.add("heart");
+    heart.innerHTML = "❤️";
+    heart.style.left = Math.random() * window.innerWidth + "px";
+    heart.style.top = window.innerHeight + "px";
+    document.body.appendChild(heart);
 
-        setTimeout(() => {
-            heart.remove();
-        }, 3000);
-    }
+    setTimeout(() => heart.remove(), 3000);
+  }
 }
 
-// No 버튼 도망 기능
+// ✅ No 버튼: 카드 안에서만 도망 (사라짐 방지 + 모바일 대응)
 const noBtn = document.getElementById("noBtn");
+const card = document.querySelector(".card");
 
-noBtn.addEventListener("mouseover", () => {
-    const x = Math.random() * (window.innerWidth - 100);
-    const y = Math.random() * (window.innerHeight - 50);
-    noBtn.style.position = "absolute";
-    noBtn.style.left = x + "px";
-    noBtn.style.top = y + "px";
+// 카드가 좌표 기준이 되도록 설정 (중요)
+card.style.position = "relative";
+noBtn.style.position = "absolute";
+
+// 초기 위치를 버튼 컨테이너 자리 근처로 지정
+// (원래 버튼 레이아웃 유지하고 싶으면, 아래처럼 시작 좌표만 잡고 absolute로 전환)
+function placeNoInitial() {
+  const cardRect = card.getBoundingClientRect();
+  const btnRect = noBtn.getBoundingClientRect();
+
+  // 카드 내부 좌표로 변환
+  const left = (btnRect.left - cardRect.left);
+  const top  = (btnRect.top - cardRect.top);
+
+  noBtn.style.left = `${left}px`;
+  noBtn.style.top  = `${top}px`;
+}
+
+// 카드 내부에서 랜덤 위치로 이동
+function moveNoButton() {
+  const cardRect = card.getBoundingClientRect();
+
+  // 버튼 크기
+  const bw = noBtn.offsetWidth;
+  const bh = noBtn.offsetHeight;
+
+  // 카드 패딩 고려해서 너무 가장자리로 안 붙게
+  const padding = 12;
+
+  const maxX = Math.max(padding, cardRect.width - bw - padding);
+  const maxY = Math.max(padding, cardRect.height - bh - padding);
+
+  const x = padding + Math.random() * (maxX - padding);
+  const y = padding + Math.random() * (maxY - padding);
+
+  noBtn.style.left = `${x}px`;
+  noBtn.style.top  = `${y}px`;
+}
+
+// 데스크톱: 마우스 올리면 도망
+noBtn.addEventListener("mouseenter", moveNoButton);
+
+// 모바일: 터치하려고 하면 도망 (click 전에 먼저 튀게)
+noBtn.addEventListener("touchstart", (e) => {
+  e.preventDefault();      // 탭으로 눌리는 걸 방지
+  moveNoButton();
+}, { passive: false });
+
+// 혹시 클릭으로 들어오면 그것도 도망
+noBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+  moveNoButton();
+});
+
+// 페이지 로드 후 초기 위치 고정
+window.addEventListener("load", () => {
+  placeNoInitial();
 });
 </script>
-
-</body>
-</html>
