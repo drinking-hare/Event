@@ -6,14 +6,23 @@
 <title>화이트데이 이벤트</title>
 <style>
     body {
-        margin: 0;
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background: linear-gradient(135deg, #ff9a9e, #fad0c4);
-        font-family: 'Pretendard', sans-serif;
-        overflow: hidden;
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    
+      /* ✅ 기본 배경 이미지 (Yes 누르기 전) */
+      background-image:
+        linear-gradient(135deg, rgba(255,154,158,0.55), rgba(250,208,196,0.55)),
+        url("01.jpg"); /* 또는 assets/01.jpg */
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    
+      font-family: 'Pretendard', sans-serif;
+      overflow: hidden;
+      transition: background-image 0.4s ease; /* 부드럽게 전환 */
     }
 
     .card {
@@ -122,6 +131,17 @@ function createHearts() {
     setTimeout(() => heart.remove(), 3000);
   }
 }
+
+function accept() {
+  // ✅ 배경 교체 (Yes 누른 후)
+  document.body.style.backgroundImage =
+    'linear-gradient(135deg, rgba(255,154,158,0.55), rgba(250,208,196,0.55)), url("02.jpg")'; 
+    // 또는 assets/02.jpg
+
+  document.getElementById("result").style.display = "block";
+  createHearts();
+}
+
 
 // ✅ No 버튼: 버튼 영역 안에서만 도망 (시작 위치 안정 + 모바일 대응)
 const noBtn = document.getElementById("noBtn");
